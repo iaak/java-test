@@ -1,0 +1,126 @@
+package DM.iris.chenwenkang;
+
+import java.awt.*;
+import java.awt.geom.Rectangle2D;
+import java.io.*;
+import java.lang.Math;
+import javax.swing.*;
+
+
+class DealData{
+	String s[] = new String[150];  
+	
+	//从文件中读入的数据会存储在s中
+	public void Read(FileReader inFile) throws IOException{
+		BufferedReader in = new BufferedReader(inFile);
+		for(int i = 0;i<150;i++){
+			s[i] = in.readLine();
+		}
+	}
+	/* method transfor  实现将读入的数据放入数组中*/
+	public double[][] transfor(double data[][])
+	{
+		//String sFirst[] = s.split("/r/n");
+		double word[][] = new double[s.length][];
+		for(int i=0;i<s.length;i++)
+		{
+			String sSecond[] = s[i].split(",");
+			word[i] = new double[sSecond.length];
+			for(int j=0;j<sSecond.length-1;j++)
+			{
+				word[i][j] = Double.parseDouble(sSecond[j]);
+				data[i][j] = word[i][j];
+			}
+		}
+		return word;
+	}
+}
+public class similarity extends Canvas{
+	
+	protected static double d[][] = new double[150][150];
+	protected static double sim[][] = new double[150][150];
+	protected static double newsim[][] = new double[150][150];
+	static String s2;
+	
+	
+
+	public static void main(String[] args) throws IOException{
+		JFrame fr = new JFrame("similarity");
+		similarity pic = new similarity();
+		FileReader in = new FileReader("F:/sixthPPT/DM/iris.txt");
+		DealData I = new DealData();
+		I.Read(in);
+		double data[][] = new double[150][5];
+		I.transfor(data);
+		int a = I.transfor(data).length;
+		double maxd = 0.;
+		double mind = 0.;
+		double maxsim = 0.;
+		double minsim = 0.;
+		int o=0,p=0,q=0;
+		for(int i=0;i<a;i++)
+		{
+			for(int j=0;j<a;j++)
+			{
+				d[i][j] = Math.sqrt(Math.pow(data[i][0]-data[j][0], 2)+Math.pow(data[i][1]-data[j][1], 2)+Math.pow(data[i][2]-data[j][2], 2)+Math.pow(data[i][3]-data[j][3], 2));
+			    //System.out.println("d:["+i+"]"+"["+j+"]"+"="+d[i][j]);
+			    o++;
+				if(d[i][j]>maxd)
+			    	maxd = d[i][j];
+			    if(d[i][j]<mind)
+			    	mind = d[i][j];
+			}
+		}
+		System.out.println("The NUM of d is: "+o);
+		for(int i=0;i<a;i++)
+		{
+			for(int j=0;j<a;j++)
+			{
+				sim[i][j] = 1-((d[i][j]-mind)/(maxd-mind));
+				//System.out.println("["+i+"]"+"["+j+"]"+"="+sim[i][j]);
+				p++;
+				if(d[i][j]>maxsim)
+			    	maxsim = d[i][j];
+			    if(d[i][j]<minsim)
+			    	minsim = d[i][j];
+			}
+		}
+		System.out.println("The NUM of sim is: "+p);
+		for(int i=0;i<a;i++)
+		{
+			for(int j=0;j<a;j++)
+			{
+				newsim[i][j] = (d[i][j]-minsim)/(maxsim-minsim);
+				//System.out.println("["+i+"]"+"["+j+"]"+"="+newsim[i][j]);
+				if(newsim[i][j]==1)
+					System.out.println("i = "+i+" "+"j = "+j);
+				q++;
+			}
+		}
+		System.out.println("The NUM of newsim is: "+q);
+		fr.add(pic);
+		fr.setBounds(0,0,900,900);
+		fr.setVisible(true);
+	}
+	
+	
+	
+	
+	
+    
+    public void paint(Graphics oldg) {
+		Graphics2D g = (Graphics2D) oldg;
+		for(int i=0;i<150;i++)
+		{
+			for(int j=0;j<150;j++)
+			{
+				int m=(int) (newsim[i][j]*255);				
+				g.setColor(new Color(64,m,50));	
+				g.fill(new Rectangle2D.Float(4*i,4*j, 4,4));
+			}
+		}
+	}
+}
+
+
+
